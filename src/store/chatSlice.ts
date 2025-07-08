@@ -27,7 +27,7 @@ const initialState: ChatState = {
       id: "1",
       type: "agent",
       content:
-        "Hello! I'm your celent AI assistant. I can help you find the perfect candidates for any role. What position are you looking to fill today?",
+        "Hello! I'm your Celent AI assistant. I can help you find the perfect candidates for any role. What position are you looking to fill today?",
       timestamp: new Date(Date.now() - 60000).toISOString(),
     },
   ],
@@ -57,7 +57,7 @@ const chatSlice = createSlice({
           id: "1",
           type: "agent",
           content:
-            "Hello! I'm your AI-powered talent scout assistant. I can help you find the perfect candidates for any role. What position are you looking to fill today?",
+            "Hello! I'm your Celent AI assistant. I can help you find the perfect candidates for any role. What position are you looking to fill today?",
           timestamp: new Date().toISOString(),
         },
       ];

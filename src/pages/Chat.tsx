@@ -28,6 +28,11 @@ import type { Message, Candidate } from "@/store/chatSlice";
 
 const Chat = () => {
   const [inputValue, setInputValue] = useState("");
+  const [runId, setRunId] = useState<string | null>(null);
+  const [suspendedStep, setSuspendedStep] = useState<string[] | null>(null);
+  const [suspendedCandidates, setSuspendedCandidates] = useState<
+    Candidate[] | null
+  >(null);
   const dispatch = useDispatch<AppDispatch>();
   const { messages, isLoading, error } = useSelector(
     (state: RootState) => state.chat
@@ -152,30 +157,68 @@ const Chat = () => {
     dispatch(setLoading(true));
 
     try {
+      // Prepare payload
+      let payload: {
+        query: string;
+        runId?: string;
+        suspendedStep?: string[];
+        candidates?: Candidate[];
+      } = {
+        query: inputValue.trim(),
+      };
+      if (runId && suspendedStep && suspendedCandidates) {
+        payload = {
+          ...payload,
+          runId,
+          suspendedStep,
+          candidates: suspendedCandidates,
+        };
+      }
+      console.log(payload);
       // Call the candidates API
-      const response = await api.post(
-        "/api/candidates",
-        {
-          query: inputValue.trim(),
+      const response = await api.post("/api/candidates", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.success && response.data.result.candidates) {
-        // Add agent message
+      });
+      console.log(response);
+      // Handle suspended response
+      if (
+        response.data.suspended &&
+        response.data.result &&
+        response.data.result.message
+      ) {
+        // Show only the agent message
         const agentMessage: Message = {
           id: (Date.now() + 1).toString(),
           type: "agent",
-          content: `I found ${response.data.result.candidates.length} candidates that match your search. Here they are:`,
+          content: response.data.result.message,
           candidates: response.data.result.candidates,
           timestamp: new Date().toISOString(),
         };
+        dispatch(addMessages([agentMessage]));
+        // Store runId, suspendedStep, and candidates for next query
+        setRunId(response.data.runId || null);
+        setSuspendedStep(response.data.suspendedStep || null);
+        setSuspendedCandidates(response.data.result.candidates || null);
+        return;
+      }
 
-        dispatch(addMessages([agentMessage, agentMessage]));
+      // Reset suspended state if not suspended
+      setRunId(null);
+      setSuspendedStep(null);
+      setSuspendedCandidates(null);
+
+      if (response.data.success && response.data.result.candidates) {
+        // Add agent message with candidates
+        const agentMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: "agent",
+          content: `I found ${response.data.result.candidates.length} candidates that will be saved. Here they are:`,
+          candidates: response.data.result.candidates,
+          timestamp: new Date().toISOString(),
+        };
+        dispatch(addMessages([agentMessage]));
       } else {
         // Handle no results
         const agentMessage: Message = {
@@ -280,7 +323,8 @@ const Chat = () => {
                 className="animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                {message.type === "candidate" && message.candidates ? (
+                {(message.type === "agent" || message.type === "candidate") &&
+                message.candidates ? (
                   <>
                     <MessageBubble message={message} />
                     <CandidateCardsBubble candidates={message.candidates} />
