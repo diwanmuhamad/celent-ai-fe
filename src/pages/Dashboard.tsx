@@ -64,39 +64,6 @@ const Dashboard = () => {
     useSelector((state: RootState) => state.auth.token) ||
     localStorage.getItem("token");
 
-  const savedCandidates = [
-    {
-      id: 1,
-      name: "Alex Chen",
-      title: "Senior React Developer",
-      location: "San Francisco, CA",
-      platform: "LinkedIn",
-      rating: 4.9,
-      skills: ["React", "TypeScript", "Node.js"],
-      avatar: "AC",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      title: "Jazz Vocalist & Composer",
-      location: "New York, NY",
-      platform: "YouTube",
-      rating: 4.8,
-      skills: ["Jazz", "Vocals", "Composition"],
-      avatar: "SJ",
-    },
-    {
-      id: 3,
-      name: "Marcus Rodriguez",
-      title: "Full Stack Engineer",
-      location: "Austin, TX",
-      platform: "LinkedIn",
-      rating: 4.9,
-      skills: ["Python", "React", "AWS"],
-      avatar: "MR",
-    },
-  ];
-
   const stats = [
     {
       label: "Total Searches",
@@ -385,76 +352,59 @@ const Dashboard = () => {
                     Your bookmarked talent discoveries
                   </CardDescription>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white/30 text-white bg-white/10"
-                >
-                  View All
-                </Button>
               </div>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {savedCandidates.map((candidate) => (
-                  <div
-                    key={candidate.id}
-                    className="p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 group"
-                  >
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-                        {candidate.avatar}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-white">
-                          {candidate.name}
-                        </h3>
-                        <p className="text-sm text-white/70">
-                          {candidate.title}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-white/80 text-sm font-medium">
-                          {candidate.rating}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {candidate.skills.slice(0, 2).map((skill, index) => (
-                        <Badge
-                          key={index}
-                          className="bg-white/10 text-white/80 bg-white/20"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
-                      {candidate.skills.length > 2 && (
-                        <Badge className="bg-white/10 text-white/80">
-                          +{candidate.skills.length - 2}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 font-medium"
-                      >
-                        <MessageSquare className="h-3 w-3 mr-1" />
-                        Contact
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-white/30 text-white bg-white/10"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    </div>
+                {candidates.length === 0 ? (
+                  <div className="text-white/70">
+                    No saved candidates found.
                   </div>
-                ))}
+                ) : (
+                  candidates.map((candidate) => (
+                    <div
+                      key={candidate.id}
+                      className="p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 group"
+                    >
+                      <div className="flex items-center space-x-4 mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                          {candidate.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-white">
+                            {candidate.name}
+                          </h3>
+                          <p className="text-sm text-white/70">
+                            {candidate.platform}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mb-4 text-white/80 text-sm">
+                        {candidate.summary}
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 font-medium"
+                          asChild
+                        >
+                          <a
+                            href={candidate.profileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            View Profile
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>

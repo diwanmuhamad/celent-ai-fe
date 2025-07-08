@@ -174,14 +174,12 @@ const Chat = () => {
           candidates: suspendedCandidates,
         };
       }
-      console.log(payload);
       // Call the candidates API
       const response = await api.post("/api/candidates", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response);
       // Handle suspended response
       if (
         response.data.suspended &&
