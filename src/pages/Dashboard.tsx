@@ -105,7 +105,7 @@ const Dashboard = () => {
       color: "from-blue-500 to-cyan-500",
     },
     {
-      label: "Candidates Found",
+      label: "Candidates Saved",
       value: "2,847",
       icon: Users,
       color: "from-purple-500 to-pink-500",

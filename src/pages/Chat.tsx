@@ -171,19 +171,11 @@ const Chat = () => {
           id: (Date.now() + 1).toString(),
           type: "agent",
           content: `I found ${response.data.result.candidates.length} candidates that match your search. Here they are:`,
-          timestamp: new Date().toISOString(),
-        };
-
-        // Add candidate message
-        const candidateMessage: Message = {
-          id: (Date.now() + 2).toString(),
-          type: "candidate",
-          content: "",
-          timestamp: new Date().toISOString(),
           candidates: response.data.result.candidates,
+          timestamp: new Date().toISOString(),
         };
 
-        dispatch(addMessages([agentMessage, candidateMessage]));
+        dispatch(addMessages([agentMessage, agentMessage]));
       } else {
         // Handle no results
         const agentMessage: Message = {
