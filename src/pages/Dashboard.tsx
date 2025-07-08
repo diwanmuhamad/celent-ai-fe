@@ -60,6 +60,7 @@ const Dashboard = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(true);
   const [loadingCandidate, setLoadingCandidate] = useState(true);
+  const [showAllRecent, setShowAllRecent] = useState(false);
   const token =
     useSelector((state: RootState) => state.auth.token) ||
     localStorage.getItem("token");
@@ -257,45 +258,54 @@ const Dashboard = () => {
                       No recent searches found.
                     </div>
                   ) : (
-                    recentSearches.map((search) => (
-                      <div
-                        key={search.id}
-                        className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group"
-                        onClick={() => navigate(`/chat?threadId=${search.id}`)}
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform">
-                            <Search className="h-4 w-4 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-white font-medium">
-                              {search.title}
-                            </p>
-                            <p className="text-white/60 text-sm">
-                              {new Date(search.createdAt).toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-white/70 text-white"
+                    <>
+                      {(showAllRecent
+                        ? recentSearches
+                        : recentSearches.slice(0, 3)
+                      ).map((search) => (
+                        <div
+                          key={search.id}
+                          className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group"
                           onClick={() =>
                             navigate(`/chat?threadId=${search.id}`)
                           }
                         >
-                          <ExternalLink className="h-4 w-4" />
+                          <div className="flex items-center space-x-4">
+                            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform">
+                              <Search className="h-4 w-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="text-white font-medium">
+                                {search.title}
+                              </p>
+                              <p className="text-white/60 text-sm">
+                                {new Date(search.createdAt).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-white/70 text-white"
+                            onClick={() =>
+                              navigate(`/chat?threadId=${search.id}`)
+                            }
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      {recentSearches.length > 3 && (
+                        <Button
+                          variant="outline"
+                          className="w-full border-white/30 text-white bg-white/10 mt-4"
+                          onClick={() => setShowAllRecent((prev) => !prev)}
+                        >
+                          {showAllRecent ? "Show Less" : "View All"}
                         </Button>
-                      </div>
-                    ))
+                      )}
+                    </>
                   )}
-                  {/* <Button
-                    variant="outline"
-                    className="w-full border-white/30 text-white bg-white/10 mt-4"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    View All Searches
-                  </Button> */}
                 </CardContent>
               </Card>
             </div>
